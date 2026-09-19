@@ -1,0 +1,9 @@
+# 运行产物
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# 密钥与本地配置——这两样永远不许进仓库
+all_keys.json
+config.json

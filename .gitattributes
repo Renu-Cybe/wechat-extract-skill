@@ -1,0 +1,7 @@
+# 文本一律按 LF 存/取，避免跨平台伪差异（本库因此踩过坑）
+* text=auto eol=lf
+
+# 这几样是二进制或对行尾/空白极度敏感，禁止任何转换
+*.patch -text
+*.arm64 -text
+*.png -text
