@@ -73,7 +73,13 @@ if ($Version) {
     $gh = Get-Command gh -ErrorAction SilentlyContinue
     if (-not $gh) { throw "gh not found on PATH; install it (winget install GitHub.cli) or skip -Version" }
     Write-Host "[4/4] creating release $Version..."
-    $ghArgs = @('release', 'create', $Version, $zipPath, '--title', $Version)
+    # gh infers the repo from the CURRENT directory, which is not necessarily
+    # this repo. Derive OWNER/REPO from this repo's own origin and pass it.
+    $remoteUrl = (& git -C $skillDir remote get-url origin).Trim()
+    $slug = ($remoteUrl -replace '^.*github\.com[:/]', '') -replace '\.git$', ''
+    if (-not $slug -or $slug -notmatch '/') { throw "cannot derive OWNER/REPO from origin: $remoteUrl" }
+    Write-Host "      repo: $slug"
+    $ghArgs = @('release', 'create', $Version, $zipPath, '--repo', $slug, '--title', $Version)
     if ($Notes) { $ghArgs += @('--notes', $Notes) } else { $ghArgs += @('--generate-notes') }
     & $gh.Source @ghArgs
     if ($LASTEXITCODE -ne 0) { throw "gh release create failed" }
